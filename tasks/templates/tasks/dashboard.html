@@ -1,0 +1,46 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard</h1>
+    <a href="{% url 'task-create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Task</a>
+</div>
+
+<div class="dashboard-grid">
+    <div class="glass-panel stat-card">
+        <div class="stat-title">Pending Tasks</div>
+        <div class="stat-value" style="color: var(--warning)">{{ pending_tasks_count }}</div>
+    </div>
+    <div class="glass-panel stat-card">
+        <div class="stat-title">In Progress</div>
+        <div class="stat-value" style="color: var(--accent-color)">{{ in_progress_tasks_count }}</div>
+    </div>
+    <div class="glass-panel stat-card">
+        <div class="stat-title">Completed</div>
+        <div class="stat-value" style="color: var(--success)">{{ completed_tasks_count }}</div>
+    </div>
+    <div class="glass-panel stat-card">
+        <div class="stat-title">Total Projects</div>
+        <div class="stat-value">{{ total_projects }}</div>
+    </div>
+</div>
+
+<h2>Today's Activities</h2>
+<div class="glass-panel">
+    <div class="item-list">
+        {% for task in todays_tasks %}
+        <div class="list-item">
+            <div class="item-info">
+                <h4>{{ task.title }}</h4>
+                <p>Project: {{ task.project.name }} | Due: {{ task.due_date }}</p>
+            </div>
+            <div class="item-actions">
+                <span class="badge {{ task.status|lower|slugify }}">{{ task.status }}</span>
+                <a href="{% url 'task-update' task.pk %}" class="btn btn-secondary"><i class="fas fa-edit"></i></a>
+            </div>
+        </div>
+        {% empty %}
+        <p>No tasks due today. Great job!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

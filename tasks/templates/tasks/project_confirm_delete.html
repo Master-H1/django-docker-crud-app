@@ -1,0 +1,17 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>Delete Project</h1>
+    <a href="{% url 'project-list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<div class="glass-panel" style="max-width: 600px;">
+    <p>Are you sure you want to delete the project "<strong>{{ object.name }}</strong>"? This action cannot be undone and will also delete all associated tasks.</p>
+    
+    <form method="post" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Delete Project</button>
+        <a href="{% url 'project-list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

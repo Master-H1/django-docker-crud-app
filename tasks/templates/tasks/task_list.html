@@ -1,0 +1,27 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>Tasks</h1>
+    <a href="{% url 'task-create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Task</a>
+</div>
+
+<div class="glass-panel">
+    <div class="item-list">
+        {% for task in tasks %}
+        <div class="list-item">
+            <div class="item-info">
+                <h4>{{ task.title }}</h4>
+                <p>Project: {{ task.project.name }} | Due: {{ task.due_date }}</p>
+            </div>
+            <div class="item-actions">
+                <span class="badge {{ task.status|lower|slugify }}">{{ task.status }}</span>
+                <a href="{% url 'task-update' task.pk %}" class="btn btn-secondary"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'task-delete' task.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+            </div>
+        </div>
+        {% empty %}
+        <p>No tasks found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

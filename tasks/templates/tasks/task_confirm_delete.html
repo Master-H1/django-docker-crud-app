@@ -1,0 +1,17 @@
+{% extends 'tasks/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1>Delete Task</h1>
+    <a href="{% url 'task-list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+
+<div class="glass-panel" style="max-width: 600px;">
+    <p>Are you sure you want to delete the task "<strong>{{ object.title }}</strong>"? This action cannot be undone.</p>
+    
+    <form method="post" style="margin-top: 2rem;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Yes, Delete Task</button>
+        <a href="{% url 'task-list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
