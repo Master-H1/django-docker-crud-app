@@ -1,26 +1,52 @@
-FROM python:3.12-slim
+# ======= Stage 1 - builder =======
+FROM python:3.12-slim AS builder
 
-# Prevent creating .pyc files
-ENV PYTHONDONTWRITEBYTECODE 1
-# Prevent Python from buffering stdout and stderr
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends gcc libpq-dev \
+# Install system dependencies for building wheels
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/
+# Copy requirements packages
+COPY requirements.txt .
+
+# Install dependencies into /install
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install --prefix=/install -r requirements.txt
 
-COPY . /app/
+# ======= Stage 2 - production =======
+FROM python:3.12-slim AS production
 
-# Expose the port
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Set working directory
+WORKDIR /app
+
+# Install runtine dependencies only (no build-essential/compilers)
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only the installed dependencies from builder
+COPY --from=builder /install /usr/local
+
+# Copy application code
+COPY . .
+
+# Create non-root user and switch to it
+RUN addgroup --system appgroup && \
+    adduser --system --ingroup appgroup appuser
+USER appuser
+
+# Expose port
 EXPOSE 8000
 
-# Run the server
+# Command to run the application using gunicorn
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
